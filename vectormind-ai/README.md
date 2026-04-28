@@ -1,8 +1,4 @@
-# VectorDB — Spring Boot Edition
-
-Same project as [perryvegehan/Your-OWN-AI](https://github.com/perryvegehan/Your-OWN-AI), converted from C++ to **Spring Boot (Java 17)**.
-
----
+# VectorDB — Spring Boot 
 
 ## What This Does
 
