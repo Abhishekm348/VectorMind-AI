@@ -1,131 +1,130 @@
-# VectorDB — Spring Boot 
+# VectorDB - High Performance Vector Search Engine (Spring Boot, Java)
 
-## What This Does
+A Spring Boot based vector database system that implements similarity search algorithms and integrates them with real embeddings and LLM-powered Retrieval-Augmented Generation (RAG) using Ollama.
 
-| Feature | Description |
-|---|---|
-| **3 Search Algorithms** | HNSW, KD-Tree, Brute Force — same logic as C++ version |
-| **3 Distance Metrics** | Cosine, Euclidean, Manhattan |
-| **16D Demo Vectors** | 20 pre-loaded vectors across 4 categories (CS, Math, Food, Sports) |
-| **PCA Scatter Plot** | Live 2D visualization in the browser |
-| **Real Embeddings** | Paste text → Ollama embeds it with `nomic-embed-text` (768D) |
-| **RAG Pipeline** | Ask questions → HNSW retrieves chunks → llama3.2 answers |
-| **REST API** | Same endpoints as the C++ version |
+--------------------------------------------------
 
----
+## OVERVIEW
 
-## Prerequisites
+This project demonstrates how modern AI systems perform semantic search, vector indexing, and context-aware response generation.
 
-1. **Java 17+** — `java -version`
-2. **Maven 3.6+** — `mvn -version`
-3. **Ollama** — [Download from ollama.com](https://ollama.com)
+Core Idea:
+Convert data into vectors -> Store and index -> Retrieve similar results -> Generate intelligent responses
 
-After installing Ollama, pull the required models:
-```bash
-ollama pull nomic-embed-text   # ~274MB — embedding model
-ollama pull llama3.2           # ~2GB   — language model
-```
+--------------------------------------------------
 
----
+## FEATURES
 
-## Run
+Vector Search Algorithms:
+- HNSW (approximate nearest neighbor search)
+- KD-Tree (space partitioned search)
+- Brute Force (exact search)
 
-```bash
-# Clone / unzip the project
-cd vectordb-spring
+Distance Metrics:
+- Cosine Similarity
+- Euclidean Distance
+- Manhattan Distance
 
-# Run with Maven (downloads dependencies, compiles, starts server)
+Embeddings:
+- Uses Ollama (nomic-embed-text, 768 dimensions)
+- Enables semantic similarity search
+
+RAG Pipeline:
+- Retrieves top-K chunks using HNSW
+- Generates answers using Llama3.2
+
+REST API:
+- Supports CRUD, search, and benchmarking
+
+--------------------------------------------------
+
+## TECH STACK
+
+- Backend: Spring Boot (Java)
+- Algorithms: HNSW, KD-Tree, Brute Force
+- LLM and Embeddings: Ollama
+- Build Tool: Maven
+
+--------------------------------------------------
+
+## HOW IT WORKS
+
+1. Input text is converted into vector embeddings
+2. Vectors are stored using indexing algorithms
+3. Similarity search is performed using distance metrics
+4. (Optional) RAG pipeline generates responses using LLM
+
+--------------------------------------------------
+
+## RUN
+
 mvn spring-boot:run
 
-# OR build a JAR and run
-mvn clean package
-java -jar target/vectordb-spring-1.0.0.jar
-```
+--------------------------------------------------
 
-Open your browser at: **http://localhost:8080**
+## ACCESS APPLICATION
 
----
+Open in browser:
+http://localhost:8080
 
-## Project Structure
+--------------------------------------------------
 
-```
+## REST API
+
+Vector Operations:
+- GET /search -> Perform KNN search
+- POST /insert -> Insert vector
+- DELETE /delete/{id} -> Delete vector
+- GET /items -> List vectors
+- GET /benchmark -> Compare algorithms
+- GET /hnsw-info -> Graph stats
+
+Document and RAG:
+- POST /doc/insert -> Store document
+- POST /doc/ask -> Ask question
+- GET /doc/list -> List documents
+- DELETE /doc/delete/{id} -> Delete document
+
+--------------------------------------------------
+
+## PERFORMANCE HIGHLIGHTS
+
+- Fast approximate search using HNSW
+- Efficient similarity comparison
+- Real-time semantic search
+- Built-in benchmarking
+
+--------------------------------------------------
+
+## PROJECT STRUCTURE
+
 src/main/java/com/vectordb/
-├── VectorDbApplication.java          ← Spring Boot entry point
-├── algorithm/
-│   ├── BruteForce.java               ← O(N·d) exact search
-│   ├── KDTree.java                   ← O(log N) axis-partitioned search
-│   ├── HNSW.java                     ← O(log N) approximate graph search
-│   └── DistanceMetrics.java          ← cosine / euclidean / manhattan
-├── model/
-│   ├── VectorItem.java
-│   ├── DocItem.java
-│   └── SearchHit.java
-├── service/
-│   ├── VectorDbService.java          ← unified 16D demo index
-│   ├── DocumentDbService.java        ← HNSW over Ollama embeddings
-│   ├── OllamaService.java            ← HTTP client for Ollama
-│   └── TextChunker.java              ← 250-word overlapping chunks
-├── controller/
-│   ├── VectorController.java         ← /search /insert /delete /items /benchmark /hnsw-info
-│   └── DocumentController.java       ← /doc/insert /doc/list /doc/ask /status
-└── config/
-    └── DemoDataLoader.java           ← loads 20 demo vectors on startup
+  algorithm/
+  model/
+  service/
+  controller/
+  config/
 
 src/main/resources/
-├── application.properties
-└── static/index.html                 ← same frontend UI
-```
+  static/
 
----
+--------------------------------------------------
 
-## REST API (identical to C++ version)
+## PURPOSE
 
-### Demo Vectors
-| Method | Endpoint | Description |
-|---|---|---|
-| GET | `/search?v=f1,f2,...&k=5&metric=cosine&algo=hnsw` | KNN search |
-| POST | `/insert` | Insert vector `{"metadata":"...","category":"...","embedding":[...]}` |
-| DELETE | `/delete/{id}` | Delete by ID |
-| GET | `/items` | List all demo vectors |
-| GET | `/benchmark?v=...&k=5&metric=cosine` | Compare all 3 algorithms |
-| GET | `/hnsw-info` | HNSW graph stats |
-| GET | `/stats` | DB statistics |
+- Learn vector database internals
+- Implement search algorithms
+- Explore RAG systems
+- Work with embeddings and LLMs
 
-### Documents & RAG
-| Method | Endpoint | Body | Description |
-|---|---|---|---|
-| POST | `/doc/insert` | `{"title":"...","text":"..."}` | Embed & store |
-| GET | `/doc/list` | — | List stored chunks |
-| DELETE | `/doc/delete/{id}` | — | Delete chunk |
-| POST | `/doc/ask` | `{"question":"...","k":3}` | RAG: retrieve + generate |
-| GET | `/status` | — | Ollama health check |
+--------------------------------------------------
 
----
+## LIMITATIONS
 
-## Configuration (`application.properties`)
+- In-memory storage
+- Not production optimized
+- Requires local Ollama
 
-```properties
-server.port=8080
-ollama.host=http://localhost:11434
-ollama.embed-model=nomic-embed-text
-ollama.gen-model=llama3.2           # change to llama3.2:1b for faster (but weaker) answers
-vectordb.demo-dims=16
-vectordb.chunk-words=250
-vectordb.chunk-overlap=30
-```
+--------------------------------------------------
 
----
-
-## C++ vs Spring Boot Mapping
-
-| C++ | Spring Boot |
-|---|---|
-| `httplib.h` HTTP server | Spring MVC (`@RestController`) |
-| `HNSW` struct + graph | `HNSW.java` class with `HashMap<Integer, Node>` |
-| `KDTree` recursive | `KDTree.java` with same recursive insert/search |
-| `OllamaClient` | `OllamaService.java` using `java.net.http.HttpClient` |
-| `VectorDB` unified index | `VectorDbService.java` Spring `@Service` |
-| `DocumentDB` | `DocumentDbService.java` Spring `@Service` |
-| `chunkText()` | `TextChunker.java` Spring `@Component` |
-| Demo data in `main()` | `DemoDataLoader.java` implements `CommandLineRunner` |
-| `index.html` as embedded string | `src/main/resources/static/index.html` |
+Feel free to explore and improve.
